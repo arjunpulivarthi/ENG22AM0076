@@ -28,7 +28,7 @@ const CorrelationPage = () => {
           let link = `http://localhost:8000/stockcorrelation?minutes=${min}&ticker=${stockList[i]}&ticker=${stockList[j]}`
           let res = await axios.get(link)
           temp[i][j] = Number(res.data.correlation.toFixed(2))
-        } catch (e) {
+        } catch {
           temp[i][j] = null
         }
       }
@@ -40,71 +40,73 @@ const CorrelationPage = () => {
     getIt()
   }, [min])
   const color = (v) => {
-    if (v == null) return '#ccc'
-    if (v > 0.75) return '#4caf50'
-    if (v > 0.3) return '#ffc107'
-    if (v > 0) return '#ff9800'
-    return '#f44336'
+    if (v == null) return '#aaa'
+    if (v > 0.75) return '#64dd17'
+    if (v > 0.3) return '#fbc02d'
+    if (v > 0) return '#fb8c00'
+    return '#e53935'
   }
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-      <Card sx={{ width: '95%', maxWidth: 900, p: 3 }}>
+      <Card sx={{ width: '95%', maxWidth: 880, p: 3 }}>
         <CardContent>
-          <Typography variant="h6" align="center">
-            correlation map
+          <Typography variant="h6" align="center" gutterBottom>
+            correlation
           </Typography>
           <TextField
-            label="minutes"
+            label="min"
             type="number"
             value={min}
             onChange={(e) => setMin(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 3, width: 120 }}
           />
           {spin ? (
             <Box sx={{ textAlign: 'center', mt: 4 }}>
               <CircularProgress />
             </Box>
           ) : (
-            <Box sx={{ overflowX: 'auto' }}>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: `80px repeat(${stockList.length}, 60px)`,
-                  gap: 0.5
-                }}
-              >
-                <Box></Box>
-                {stockList.map((x, i) => (
-                  <Box key={i} sx={{ textAlign: 'center', fontSize: 13 }}>
-                    {x}
-                  </Box>
-                ))}
-
-                {stockList.map((r, i) => (
-                  <React.Fragment key={i}>
-                    <Box sx={{ fontSize: 13 }}>{r}</Box>
-                    {stockList.map((_, j) => (
-                      <Tooltip key={j} title={data[i]?.[j] ?? 'no'}>
-                        <Box
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            backgroundColor: color(data[i]?.[j]),
-                            color: 'white',
-                            fontSize: 13,
-                            lineHeight: '60px',
-                            textAlign: 'center',
-                            borderRadius: 1
-                          }}
-                        >
-                          {data[i]?.[j] != null ? data[i][j] : 'x'}
-                        </Box>
-                      </Tooltip>
-                    ))}
-                  </React.Fragment>
-                ))}
+            data.length === stockList.length && (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: `80px repeat(${stockList.length}, 60px)`,
+                    gap: 0.5
+                  }}
+                >
+                  <Box></Box>
+                  {stockList.map((x, i) => (
+                    <Box key={i} sx={{ textAlign: 'center', fontSize: 13, fontWeight: 500 }}>
+                      {x}
+                    </Box>
+                  ))}
+                  {stockList.map((r, i) => (
+                    <React.Fragment key={i}>
+                      <Box sx={{ fontSize: 13, fontWeight: 500 }}>{r}</Box>
+                      {data[i]?.length === stockList.length &&
+                        stockList.map((_, j) => (
+                          <Tooltip key={j} title={data[i][j] ?? 'na'}>
+                            <Box
+                              sx={{
+                                width: 60,
+                                height: 60,
+                                bgcolor: color(data[i][j]),
+                                color: '#fff',
+                                fontSize: 13,
+                                lineHeight: '60px',
+                                textAlign: 'center',
+                                borderRadius: 1
+                              }}
+                            >
+                              {data[i][j] != null ? data[i][j] : 'x'}
+                            </Box>
+                          </Tooltip>
+                        ))}
+                    </React.Fragment>
+                  ))}
+                </Box>
               </Box>
-            </Box>
+            )
           )}
         </CardContent>
       </Card>
